@@ -27,6 +27,14 @@ const FIELDS = [
     max: 100,
   },
   {
+    name: 'extracurricular_activities',
+    label: 'Extracurricular Activities',
+    icon: '🏃',
+    type: 'select',
+    options: ['Yes', 'No'],
+    hint: 'Does the student participate in extracurricular activities?'
+  },
+  {
     name: 'sleep_hours',
     label: 'Sleep Hours',
     icon: '😴',
@@ -53,6 +61,7 @@ export default function PredictionForm({ onResult }) {
   const [values, setValues] = useState({
     hours_studied: '',
     previous_scores: '',
+    extracurricular_activities: '',
     sleep_hours: '',
     sample_question_papers: '',
   });
@@ -65,7 +74,7 @@ export default function PredictionForm({ onResult }) {
       const val = values[field.name];
       if (val === '' || val === null || val === undefined) {
         newErrors[field.name] = 'This field is required';
-      } else {
+      } else if (field.type !== 'select') {
         const num = parseFloat(val);
         if (isNaN(num)) {
           newErrors[field.name] = 'Must be a valid number';
@@ -102,6 +111,7 @@ export default function PredictionForm({ onResult }) {
       const numericValues = {
         hours_studied: parseFloat(values.hours_studied),
         previous_scores: parseFloat(values.previous_scores),
+        extracurricular_activities: values.extracurricular_activities,
         sleep_hours: parseFloat(values.sleep_hours),
         sample_question_papers: parseFloat(values.sample_question_papers),
       };
@@ -112,6 +122,7 @@ export default function PredictionForm({ onResult }) {
           features: [
             numericValues.hours_studied,
             numericValues.previous_scores,
+            numericValues.extracurricular_activities === 'Yes' ? 1 : 0,
             numericValues.sleep_hours,
             numericValues.sample_question_papers,
           ],
@@ -188,20 +199,37 @@ export default function PredictionForm({ onResult }) {
                 {field.label}
               </label>
               <div className="form-group__input-wrapper">
-                <input
-                  id={field.name}
-                  type="number"
-                  className={`form-group__input ${
-                    errors[field.name] ? 'form-group__input--error' : ''
-                  }`}
-                  placeholder={field.placeholder}
-                  value={values[field.name]}
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                  min={field.min}
-                  max={field.max}
-                  step="any"
-                  disabled={loading}
-                />
+                {field.type === 'select' ? (
+                  <select
+                    id={field.name}
+                    className={`form-group__input ${
+                      errors[field.name] ? 'form-group__input--error' : ''
+                    }`}
+                    value={values[field.name]}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    disabled={loading}
+                  >
+                    <option value="">Select an option</option>
+                    {field.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    id={field.name}
+                    type="number"
+                    className={`form-group__input ${
+                      errors[field.name] ? 'form-group__input--error' : ''
+                    }`}
+                    placeholder={field.placeholder}
+                    value={values[field.name]}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    min={field.min}
+                    max={field.max}
+                    step="any"
+                    disabled={loading}
+                  />
+                )}
               </div>
               {errors[field.name] ? (
                 <span className="form-group__error">⚠ {errors[field.name]}</span>
