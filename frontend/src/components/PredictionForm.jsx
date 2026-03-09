@@ -1,11 +1,21 @@
 import { useState } from 'react';
 import './PredictionForm.css';
 
-const MODELS = [
-  { id: 'neural', label: 'Neural Network', endpoint: '/predict/NeuralNetwork' },
+const CATEGORIES = [
+  { id: 'neural', label: 'Neural Network', icon: '🧠' },
+  { id: 'ensemble', label: 'Ensemble Learning', icon: '🤝' },
+];
+
+const ENSEMBLE_METHODS = [
   { id: 'voting', label: 'Voting', endpoint: '/predict/voting' },
   { id: 'bagging', label: 'Bagging', endpoint: '/predict/bagging' },
 ];
+
+const ENDPOINTS = {
+  neural: '/predict/NeuralNetwork',
+  voting: '/predict/voting',
+  bagging: '/predict/bagging',
+};
 
 const FIELDS = [
   {
@@ -57,7 +67,8 @@ const FIELDS = [
 const API_BASE = 'http://127.0.0.1:8000';
 
 export default function PredictionForm({ onResult }) {
-  const [selectedModel, setSelectedModel] = useState('neural');
+  const [selectedCategory, setSelectedCategory] = useState('neural');
+  const [ensembleMethod, setEnsembleMethod] = useState('voting');
   const [values, setValues] = useState({
     hours_studied: '',
     previous_scores: '',
@@ -105,19 +116,24 @@ export default function PredictionForm({ onResult }) {
     if (!validate()) return;
 
     setLoading(true);
-    const model = MODELS.find((m) => m.id === selectedModel);
+    const activeModel = selectedCategory === 'neural' ? 'neural' : ensembleMethod;
+    const endpoint = ENDPOINTS[activeModel];
+    const modelLabel =
+      selectedCategory === 'neural'
+        ? 'Neural Network'
+        : ENSEMBLE_METHODS.find((m) => m.id === ensembleMethod)?.label;
 
     try {
       const numericValues = {
         hours_studied: parseFloat(values.hours_studied),
         previous_scores: parseFloat(values.previous_scores),
-        extracurricular_activities: values.extracurricular_activities,
+        extracurricular_activities: parseFloat(values.extracurricular_activities === 'Yes' ? 1: 0),
         sleep_hours: parseFloat(values.sleep_hours),
         sample_question_papers: parseFloat(values.sample_question_papers),
       };
 
       let body;
-      if (selectedModel === 'neural') {
+      if (activeModel === 'neural') {
         body = {
           features: [
             numericValues.hours_studied,
@@ -131,7 +147,7 @@ export default function PredictionForm({ onResult }) {
         body = numericValues;
       }
 
-      const res = await fetch(`${API_BASE}${model.endpoint}`, {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -141,7 +157,7 @@ export default function PredictionForm({ onResult }) {
 
       const data = await res.json();
       let prediction;
-      if (selectedModel === 'neural') {
+      if (activeModel === 'neural') {
         prediction =
           Array.isArray(data.prediction[0])
             ? data.prediction[0][0]
@@ -152,7 +168,7 @@ export default function PredictionForm({ onResult }) {
 
       onResult({
         prediction: parseFloat(prediction).toFixed(2),
-        model: model.label,
+        model: modelLabel,
         inputs: { ...numericValues },
       });
     } catch (err) {
@@ -172,23 +188,47 @@ export default function PredictionForm({ onResult }) {
           </p>
         </div>
 
-        {/* Model Selector */}
+        {/* Model Category Selector */}
         <div className="model-selector" role="tablist">
-          {MODELS.map((model) => (
+          {CATEGORIES.map((cat) => (
             <button
-              key={model.id}
+              key={cat.id}
               type="button"
               role="tab"
-              aria-selected={selectedModel === model.id}
+              aria-selected={selectedCategory === cat.id}
               className={`model-selector__btn ${
-                selectedModel === model.id ? 'model-selector__btn--active' : ''
+                selectedCategory === cat.id ? 'model-selector__btn--active' : ''
               }`}
-              onClick={() => setSelectedModel(model.id)}
+              onClick={() => setSelectedCategory(cat.id)}
             >
-              {model.label}
+              <span className="model-selector__icon">{cat.icon}</span>
+              {cat.label}
             </button>
           ))}
         </div>
+
+        {/* Ensemble Sub-selector */}
+        {selectedCategory === 'ensemble' && (
+          <div className="ensemble-selector">
+            <p className="ensemble-selector__label">Choose ensemble method:</p>
+            <div className="ensemble-selector__options">
+              {ENSEMBLE_METHODS.map((method) => (
+                <button
+                  key={method.id}
+                  type="button"
+                  className={`ensemble-selector__btn ${
+                    ensembleMethod === method.id
+                      ? 'ensemble-selector__btn--active'
+                      : ''
+                  }`}
+                  onClick={() => setEnsembleMethod(method.id)}
+                >
+                  {method.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Form Fields */}
         <div className="form-fields">
