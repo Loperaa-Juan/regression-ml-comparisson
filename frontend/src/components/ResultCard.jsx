@@ -14,7 +14,7 @@ export default function ResultCard({ result }) {
           <div className="result-card__error">
             <p className="result-card__error-msg">{result.error}</p>
             <p className="result-card__error-hint">
-              Make sure the API server is running at http://127.0.0.1:8000
+              Make sure the API server is running
             </p>
           </div>
         </div>

@@ -1,80 +1,80 @@
-import { useState } from 'react';
-import './PredictionForm.css';
+import { useState } from "react";
+import "./PredictionForm.css";
 
 const CATEGORIES = [
-  { id: 'neural', label: 'Neural Network', icon: '🧠' },
-  { id: 'ensemble', label: 'Ensemble Learning', icon: '🤝' },
+  { id: "neural", label: "Neural Network", icon: "🧠" },
+  { id: "ensemble", label: "Ensemble Learning", icon: "🤝" },
 ];
 
 const ENSEMBLE_METHODS = [
-  { id: 'voting', label: 'Voting', endpoint: '/predict/voting' },
-  { id: 'bagging', label: 'Bagging', endpoint: '/predict/bagging' },
+  { id: "voting", label: "Voting", endpoint: "/predict/voting" },
+  { id: "bagging", label: "Bagging", endpoint: "/predict/bagging" },
 ];
 
 const ENDPOINTS = {
-  neural: '/predict/NeuralNetwork',
-  voting: '/predict/voting',
-  bagging: '/predict/bagging',
+  neural: "/predict/NeuralNetwork",
+  voting: "/predict/voting",
+  bagging: "/predict/bagging",
 };
 
 const FIELDS = [
   {
-    name: 'hours_studied',
-    label: 'Hours Studied',
-    icon: '📚',
-    placeholder: 'e.g. 7',
-    hint: 'Weekly hours dedicated to studying',
+    name: "hours_studied",
+    label: "Hours Studied",
+    icon: "📚",
+    placeholder: "e.g. 7",
+    hint: "Weekly hours dedicated to studying",
     min: 0,
     max: 168,
   },
   {
-    name: 'previous_scores',
-    label: 'Previous Scores',
-    icon: '📊',
-    placeholder: 'e.g. 85',
-    hint: 'Scores from prior assessments (0–100)',
+    name: "previous_scores",
+    label: "Previous Scores",
+    icon: "📊",
+    placeholder: "e.g. 85",
+    hint: "Scores from prior assessments (0–100)",
     min: 0,
     max: 100,
   },
   {
-    name: 'extracurricular_activities',
-    label: 'Extracurricular Activities',
-    icon: '🏃',
-    type: 'select',
-    options: ['Yes', 'No'],
-    hint: 'Does the student participate in extracurricular activities?'
+    name: "extracurricular_activities",
+    label: "Extracurricular Activities",
+    icon: "🏃",
+    type: "select",
+    options: ["Yes", "No"],
+    hint: "Does the student participate in extracurricular activities?",
   },
   {
-    name: 'sleep_hours',
-    label: 'Sleep Hours',
-    icon: '😴',
-    placeholder: 'e.g. 8',
-    hint: 'Average daily sleep hours',
+    name: "sleep_hours",
+    label: "Sleep Hours",
+    icon: "😴",
+    placeholder: "e.g. 8",
+    hint: "Average daily sleep hours",
     min: 0,
     max: 24,
   },
   {
-    name: 'sample_question_papers',
-    label: 'Sample Papers Practiced',
-    icon: '📝',
-    placeholder: 'e.g. 5',
-    hint: 'Number of practice papers completed',
+    name: "sample_question_papers",
+    label: "Sample Papers Practiced",
+    icon: "📝",
+    placeholder: "e.g. 5",
+    hint: "Number of practice papers completed",
     min: 0,
     max: 100,
   },
 ];
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
 export default function PredictionForm({ onResult }) {
-  const [selectedCategory, setSelectedCategory] = useState('neural');
-  const [ensembleMethod, setEnsembleMethod] = useState('voting');
+  const [selectedCategory, setSelectedCategory] = useState("neural");
+  const [ensembleMethod, setEnsembleMethod] = useState("voting");
   const [values, setValues] = useState({
-    hours_studied: '',
-    previous_scores: '',
-    extracurricular_activities: '',
-    sleep_hours: '',
-    sample_question_papers: '',
+    hours_studied: "",
+    previous_scores: "",
+    extracurricular_activities: "",
+    sleep_hours: "",
+    sample_question_papers: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -83,12 +83,12 @@ export default function PredictionForm({ onResult }) {
     const newErrors = {};
     FIELDS.forEach((field) => {
       const val = values[field.name];
-      if (val === '' || val === null || val === undefined) {
-        newErrors[field.name] = 'This field is required';
-      } else if (field.type !== 'select') {
+      if (val === "" || val === null || val === undefined) {
+        newErrors[field.name] = "This field is required";
+      } else if (field.type !== "select") {
         const num = parseFloat(val);
         if (isNaN(num)) {
-          newErrors[field.name] = 'Must be a valid number';
+          newErrors[field.name] = "Must be a valid number";
         } else if (num < field.min) {
           newErrors[field.name] = `Minimum value is ${field.min}`;
         } else if (num > field.max) {
@@ -116,29 +116,32 @@ export default function PredictionForm({ onResult }) {
     if (!validate()) return;
 
     setLoading(true);
-    const activeModel = selectedCategory === 'neural' ? 'neural' : ensembleMethod;
+    const activeModel =
+      selectedCategory === "neural" ? "neural" : ensembleMethod;
     const endpoint = ENDPOINTS[activeModel];
     const modelLabel =
-      selectedCategory === 'neural'
-        ? 'Neural Network'
+      selectedCategory === "neural"
+        ? "Neural Network"
         : ENSEMBLE_METHODS.find((m) => m.id === ensembleMethod)?.label;
 
     try {
       const numericValues = {
         hours_studied: parseFloat(values.hours_studied),
         previous_scores: parseFloat(values.previous_scores),
-        extracurricular_activities: parseFloat(values.extracurricular_activities === 'Yes' ? 1: 0),
+        extracurricular_activities: parseFloat(
+          values.extracurricular_activities === "Yes" ? 1 : 0,
+        ),
         sleep_hours: parseFloat(values.sleep_hours),
         sample_question_papers: parseFloat(values.sample_question_papers),
       };
 
       let body;
-      if (activeModel === 'neural') {
+      if (activeModel === "neural") {
         body = {
           features: [
             numericValues.hours_studied,
             numericValues.previous_scores,
-            numericValues.extracurricular_activities === 'Yes' ? 1 : 0,
+            numericValues.extracurricular_activities === "Yes" ? 1 : 0,
             numericValues.sleep_hours,
             numericValues.sample_question_papers,
           ],
@@ -148,8 +151,8 @@ export default function PredictionForm({ onResult }) {
       }
 
       const res = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
@@ -157,11 +160,10 @@ export default function PredictionForm({ onResult }) {
 
       const data = await res.json();
       let prediction;
-      if (activeModel === 'neural') {
-        prediction =
-          Array.isArray(data.prediction[0])
-            ? data.prediction[0][0]
-            : data.prediction[0];
+      if (activeModel === "neural") {
+        prediction = Array.isArray(data.prediction[0])
+          ? data.prediction[0][0]
+          : data.prediction[0];
       } else {
         prediction = data.prediction[0];
       }
@@ -197,7 +199,7 @@ export default function PredictionForm({ onResult }) {
               role="tab"
               aria-selected={selectedCategory === cat.id}
               className={`model-selector__btn ${
-                selectedCategory === cat.id ? 'model-selector__btn--active' : ''
+                selectedCategory === cat.id ? "model-selector__btn--active" : ""
               }`}
               onClick={() => setSelectedCategory(cat.id)}
             >
@@ -208,7 +210,7 @@ export default function PredictionForm({ onResult }) {
         </div>
 
         {/* Ensemble Sub-selector */}
-        {selectedCategory === 'ensemble' && (
+        {selectedCategory === "ensemble" && (
           <div className="ensemble-selector">
             <p className="ensemble-selector__label">Choose ensemble method:</p>
             <div className="ensemble-selector__options">
@@ -218,8 +220,8 @@ export default function PredictionForm({ onResult }) {
                   type="button"
                   className={`ensemble-selector__btn ${
                     ensembleMethod === method.id
-                      ? 'ensemble-selector__btn--active'
-                      : ''
+                      ? "ensemble-selector__btn--active"
+                      : ""
                   }`}
                   onClick={() => setEnsembleMethod(method.id)}
                 >
@@ -239,11 +241,11 @@ export default function PredictionForm({ onResult }) {
                 {field.label}
               </label>
               <div className="form-group__input-wrapper">
-                {field.type === 'select' ? (
+                {field.type === "select" ? (
                   <select
                     id={field.name}
                     className={`form-group__input ${
-                      errors[field.name] ? 'form-group__input--error' : ''
+                      errors[field.name] ? "form-group__input--error" : ""
                     }`}
                     value={values[field.name]}
                     onChange={(e) => handleChange(field.name, e.target.value)}
@@ -251,7 +253,9 @@ export default function PredictionForm({ onResult }) {
                   >
                     <option value="">Select an option</option>
                     {field.options.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
                     ))}
                   </select>
                 ) : (
@@ -259,7 +263,7 @@ export default function PredictionForm({ onResult }) {
                     id={field.name}
                     type="number"
                     className={`form-group__input ${
-                      errors[field.name] ? 'form-group__input--error' : ''
+                      errors[field.name] ? "form-group__input--error" : ""
                     }`}
                     placeholder={field.placeholder}
                     value={values[field.name]}
@@ -272,7 +276,9 @@ export default function PredictionForm({ onResult }) {
                 )}
               </div>
               {errors[field.name] ? (
-                <span className="form-group__error">⚠ {errors[field.name]}</span>
+                <span className="form-group__error">
+                  ⚠ {errors[field.name]}
+                </span>
               ) : (
                 <span className="form-group__hint">{field.hint}</span>
               )}
@@ -282,18 +288,14 @@ export default function PredictionForm({ onResult }) {
 
         {/* Submit */}
         <div className="form-submit">
-          <button
-            type="submit"
-            className="form-submit__btn"
-            disabled={loading}
-          >
+          <button type="submit" className="form-submit__btn" disabled={loading}>
             {loading ? (
               <>
                 <div className="form-submit__spinner" />
                 Predicting...
               </>
             ) : (
-              'Get Prediction'
+              "Get Prediction"
             )}
           </button>
         </div>
