@@ -40,3 +40,29 @@
   border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
 }
+
+@media (max-width: 768px) {
+  .app__footer-models {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .app__footer {
+    padding: var(--space-lg) var(--space-sm);
+  }
+
+  .app__footer-text {
+    font-size: 0.75rem;
+  }
+
+  .app__footer-models {
+    gap: var(--space-sm);
+  }
+
+  .app__footer-model-tag {
+    font-size: 0.625rem;
+    padding: 3px 10px;
+  }
+}

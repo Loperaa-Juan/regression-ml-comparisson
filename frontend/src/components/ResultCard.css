@@ -172,3 +172,44 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .result-section {
+    padding: 0 var(--space-sm) var(--space-2xl);
+  }
+
+  .result-card {
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
+
+  .result-card__icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .result-card__title {
+    font-size: 0.875rem;
+  }
+
+  .result-card__score-number {
+    font-size: clamp(2.5rem, 7vw, 3.5rem);
+  }
+
+  .result-card__score-label {
+    font-size: 0.8125rem;
+  }
+
+  .result-card__model-badge {
+    padding: 6px 16px;
+    font-size: 0.75rem;
+  }
+
+  .result-card__summary-label {
+    font-size: 0.625rem;
+  }
+
+  .result-card__summary-value {
+    font-size: 1rem;
+  }
+}
