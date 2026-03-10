@@ -196,4 +196,25 @@ a:hover {
     --space-3xl: 40px;
     --space-4xl: 56px;
   }
+
+  body::before {
+    background-size: 40px 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --space-xl: 24px;
+    --space-2xl: 32px;
+    --space-3xl: 32px;
+    --space-4xl: 40px;
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body::before {
+    background-size: 32px 32px;
+  }
 }

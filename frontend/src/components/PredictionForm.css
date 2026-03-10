@@ -291,4 +291,70 @@
   .model-selector {
     flex-direction: column;
   }
+
+  .ensemble-selector__options {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section {
+    padding: 0 var(--space-sm) var(--space-2xl);
+  }
+
+  .form-card {
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
+
+  .form-card__title {
+    font-size: 1.2rem;
+  }
+
+  .form-card__desc {
+    font-size: 0.8125rem;
+  }
+
+  .model-selector {
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .model-selector__btn {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+
+  .model-selector__icon {
+    font-size: 0.95rem;
+    margin-right: 4px;
+  }
+
+  .ensemble-selector {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .ensemble-selector__btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+
+  .form-group__label {
+    font-size: 0.75rem;
+  }
+
+  .form-group__input {
+    padding: 12px 14px;
+    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .form-group__hint {
+    font-size: 0.6875rem;
+  }
+
+  .form-submit__btn {
+    padding: 14px 20px;
+    font-size: 0.9375rem;
+  }
 }
