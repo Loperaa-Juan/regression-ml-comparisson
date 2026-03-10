@@ -3,7 +3,8 @@ import "./PredictionForm.css";
 
 const CATEGORIES = [
   { id: "neural", label: "Neural Network", icon: "🧠" },
-  { id: "ensemble", label: "Ensemble Learning", icon: "🤝" },
+  { id: "ensemble", label: "Ensemble", icon: "🤝" },
+  { id: "genetic", label: "Genetic", icon: "🧬" },
 ];
 
 const ENSEMBLE_METHODS = [
@@ -15,6 +16,7 @@ const ENDPOINTS = {
   neural: "/predict/NeuralNetwork",
   voting: "/predict/voting",
   bagging: "/predict/bagging",
+  genetic: "/predict/GeneticAlgorithm",
 };
 
 const FIELDS = [
@@ -117,12 +119,18 @@ export default function PredictionForm({ onResult }) {
 
     setLoading(true);
     const activeModel =
-      selectedCategory === "neural" ? "neural" : ensembleMethod;
+      selectedCategory === "neural"
+        ? "neural"
+        : selectedCategory === "genetic"
+          ? "genetic"
+          : ensembleMethod;
     const endpoint = ENDPOINTS[activeModel];
     const modelLabel =
       selectedCategory === "neural"
         ? "Neural Network"
-        : ENSEMBLE_METHODS.find((m) => m.id === ensembleMethod)?.label;
+        : selectedCategory === "genetic"
+          ? "Genetic Algorithm"
+          : ENSEMBLE_METHODS.find((m) => m.id === ensembleMethod)?.label;
 
     try {
       const numericValues = {
@@ -136,7 +144,7 @@ export default function PredictionForm({ onResult }) {
       };
 
       let body;
-      if (activeModel === "neural") {
+      if (activeModel === "neural" || activeModel === "genetic") {
         body = {
           features: [
             numericValues.hours_studied,
@@ -160,14 +168,14 @@ export default function PredictionForm({ onResult }) {
 
       const data = await res.json();
       let prediction;
-      if (activeModel === "neural") {
+      if (activeModel === "neural" || activeModel === "genetic") {
         prediction = Array.isArray(data.prediction[0])
           ? data.prediction[0][0]
           : data.prediction[0];
       } else {
         prediction = data.prediction[0];
       }
-
+      
       onResult({
         prediction: parseFloat(prediction).toFixed(2),
         model: modelLabel,
