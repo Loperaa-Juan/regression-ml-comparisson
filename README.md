@@ -82,14 +82,19 @@ primer_taller_IA2/
 │   ├── main.py                      # FastAPI app & endpoint definitions
 │   ├── models.py                    # Pydantic request schemas
 │   ├── requirements.txt             # Python dependencies
+│   ├── Dockerfile                   # Dockerfile for FastAPI app
 │   └── services/
 │       ├── neural_network.py        # ONNX inference service
 │       ├── assembly_algorithms.py   # Ensemble model inference service
+│       ├── genetic_algorithm.py     # Genetic algorithm inference service
 │       └── models/
 │           ├── nn_model.onnx                         # Trained neural network
 │           ├── voting_regressor_trained-0.1.0.pkl     # Trained voting ensemble
 │           └── bagging_regressor_trained-0.1.0.pkl    # Trained bagging ensemble
+|
 ├── frontend/
+│   ├── nginx/ 
+│   │   └── nginx.conf # Nginx configuration for frontend
 │   ├── src/
 │   │   ├── assets/
 │   │   │   └── vite.svg
@@ -108,8 +113,11 @@ primer_taller_IA2/
 │   │   └── main.jsx
 │   ├── public/
 │   │   └── vite.svg
+│   ├── Dockerfile # Dockerfile for frontend
 │   ├── package.json
 │   └── vite.config.js
+|
+├── docker-compose.yml # Docker Compose for frontend and backend
 ```
 
 ---
@@ -143,6 +151,10 @@ primer_taller_IA2/
 ### 3. Bagging Regressor (`bagging_regressor_trained-0.1.0.pkl`)
 - Trained in `notebooks/assembly_algorithms.ipynb`.
 - A **scikit-learn `BaggingRegressor`** that trains multiple instances on random subsets and aggregates results.
+
+## 4. Genetic Algorithm
+- Trained in `notebooks/genetic_algorithm.ipynb`.
+- A **from scratch** implementation of a genetic algorithm to find the best coefficients for a linear regression model.
 
 ---
 
@@ -181,13 +193,39 @@ pip install -r api/requirements.txt
 ### Step 4 — Run the API server
 
 ```bash
-uvicorn main:app --reload
+fastapi dev api/main.py
 ```
 
 > The server starts at **http://127.0.0.1:8000**. Interactive API docs are available at **http://127.0.0.1:8000/docs**.
 
+### Step 5 — Run the frontend server
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+> The frontend server starts at **http://localhost:5173**.
+
 ---
 
+## Docker Execution (Optional)
+
+All the application can be run using Docker. You need to have Docker installed on your machine.
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+Remember to stop the containers when you are done.
+
+```bash
+docker compose down
+```
+
+---
 ## API Endpoints
 
 ### `GET /`
